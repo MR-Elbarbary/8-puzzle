@@ -8,6 +8,7 @@ class Node {
     int depth;
     int cost; // g(n) for A*
     int heuristic; // h(n) for A*
+    int totalCost; // cost or depth + heuristic
 }
 
 class PuzzleSolver {
@@ -36,10 +37,48 @@ class PuzzleSolver {
         return null;
     }
 
-    public void BFS(Node start) {
+    public Node BFS(Node start) {
+        Set<String> visited = new HashSet<>();
+        Queue<Node> queue = new LinkedList<>();
+        queue.add(start);
+        visited.add(Arrays.deepToString(start.state));
+        while (!queue.isEmpty()) {
+            Node currentNode = queue.poll();
+            if (Arrays.deepEquals(goalState, currentNode.state)) {
+                return currentNode;
+            }
+            for (Node nextNode : getLegalMoves(currentNode)) {
+                if (!visited.contains(Arrays.deepToString(nextNode.state))) {
+                    queue.add(nextNode);
+                    visited.add(Arrays.deepToString(nextNode.state));
+                }
+            }
+        }
+        return null;
     }
 
-    public void AStar(Node start) {
+    public Node AStar(Node start) {
+        PriorityQueue<Node> minHeap = new PriorityQueue<>(Comparator.comparing(n -> n.totalCost));
+        Set<String> visited = new HashSet<>();
+        start.heuristic = heuristic(start);
+        start.totalCost = start.depth + start.heuristic;
+        minHeap.add(start);
+        visited.add(Arrays.deepToString(start.state));
+        while (!minHeap.isEmpty()) {
+            Node currentNode = minHeap.poll();
+            if (Arrays.deepEquals(goalState, currentNode.state)) {
+                return currentNode;
+            }
+            for (Node nextNode : getLegalMoves(currentNode)) {
+                if (!visited.contains(Arrays.deepToString(nextNode.state))) {
+                    nextNode.heuristic = heuristic(nextNode);
+                    nextNode.totalCost = nextNode.depth + nextNode.heuristic;
+                    minHeap.add(nextNode);
+                    visited.add(Arrays.deepToString(nextNode.state));                    
+                }
+            }
+        }
+        return null;
     }
 
     private int heuristic(Node node) {
