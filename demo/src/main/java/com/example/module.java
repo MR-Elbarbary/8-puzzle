@@ -23,16 +23,17 @@ class PuzzleSolver {
         {0, -1}, // Left
         {0, 1}   // Right
     };
-    public void DFS(Node start, Set<String> visited) {
+    public Node DFS(Node start, Set<String> visited) {
         if (Arrays.deepEquals(goalState, start.state)) {
-            return;
+            return start;
         }
         visited.add(Arrays.deepToString(start.state));
-        for (String string : visited) {
-            if (!visited.contains(Arrays.deepToString(start.state))) {
-            
+        for (Node nextNode : getLegalMoves(start)) {
+            if (!visited.contains(Arrays.deepToString(nextNode.state))) {
+                DFS(nextNode, visited);
             }
         }
+        return null;
     }
 
     public void BFS(Node start) {
@@ -92,7 +93,6 @@ class PuzzleSolver {
                 moves.add(newNode);
             }
         }
-
         return moves;
     }
     private int[][] deepCopy(int[][] currentState) {
