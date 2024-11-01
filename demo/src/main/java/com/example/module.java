@@ -17,7 +17,22 @@ class PuzzleSolver {
         {3, 4, 5},
         {6, 7, 8}
     };
-    public void DFS(Node start) {
+    private final int[][] directions = {
+        {-1, 0}, // Up
+        {1, 0},  // Down
+        {0, -1}, // Left
+        {0, 1}   // Right
+    };
+    public void DFS(Node start, Set<String> visited) {
+        if (Arrays.deepEquals(goalState, start.state)) {
+            return;
+        }
+        visited.add(Arrays.deepToString(start.state));
+        for (String string : visited) {
+            if (!visited.contains(Arrays.deepToString(start.state))) {
+            
+            }
+        }
     }
 
     public void BFS(Node start) {
@@ -41,5 +56,49 @@ class PuzzleSolver {
             }
         }
         return distance;
+    }
+
+    private int[] findEmptyTile(int[][] state) {
+        for (int i = 0; i < state.length; i++) {
+            for (int j = 0; j < state[0].length; j++) {
+                if (state[i][j] == 0) {
+                    return new int[]{i, j};
+                }
+            }
+        }
+        return null;
+    }
+    private List<Node> getLegalMoves(Node node) {
+        List<Node> moves = new ArrayList<>();
+        int[][] currentState = node.state;
+        int[] emptyTilePos = findEmptyTile(currentState);
+        int row = emptyTilePos[0];
+        int col = emptyTilePos[1];
+        for (int[] direction : directions) {
+            int newRow = row + direction[0];
+            int newCol = col + direction[1];
+            if (newRow >= 0 && newRow < 3 && newCol >= 0 && newCol < 3) {
+                int[][] newState = deepCopy(currentState);
+                newState[row][col] = newState[newRow][newCol];
+                newState[newRow][newCol] = 0;
+
+                // Create a new Node for the new state
+                //might refactor
+                Node newNode = new Node();
+                newNode.state = newState;
+                newNode.parent = node;
+                newNode.depth = node.depth + 1;
+
+                moves.add(newNode);
+            }
+        }
+
+        return moves;
+    }
+    private int[][] deepCopy(int[][] currentState) {
+        int [][] newState = new int[currentState.length][];
+        for(int i = 0; i < currentState.length; i++)
+            newState[i] = currentState[i].clone();
+        return newState;
     }
 }
