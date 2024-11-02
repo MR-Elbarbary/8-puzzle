@@ -1,17 +1,10 @@
 package main.java.com.example;
 
+
 import java.util.*;
+import main.java.com.example.Node;
 
-class Node {
-    int[][] state;
-    Node parent;
-    int depth;
-    int cost; // g(n) for A*
-    int heuristic; // h(n) for A*
-    int totalCost; // cost or depth + heuristic
-}
-
-class PuzzleSolver {
+public class puzzleSolver {
 
     private final int[][] goalState = {
         {0, 1, 2},
@@ -26,6 +19,9 @@ class PuzzleSolver {
     };
     public Node DFS(Node start, Set<String> visited) {
         if (Arrays.deepEquals(goalState, start.state)) {
+            System.out.println("Path cost: "+currentNode.depth);
+            System.out.println("path:");
+            System.out.println(toStringPath(start));
             return start;
         }
         visited.add(Arrays.deepToString(start.state));
@@ -45,6 +41,10 @@ class PuzzleSolver {
         while (!queue.isEmpty()) {
             Node currentNode = queue.poll();
             if (Arrays.deepEquals(goalState, currentNode.state)) {
+                System.out.println("Nodes expanded: "+visited.size());
+                System.out.println("Path cost: "+currentNode.depth);
+                System.out.println("path:");
+                System.out.println(toStringPath(start));
                 return currentNode;
             }
             for (Node nextNode : getLegalMoves(currentNode)) {
@@ -67,6 +67,10 @@ class PuzzleSolver {
         while (!minHeap.isEmpty()) {
             Node currentNode = minHeap.poll();
             if (Arrays.deepEquals(goalState, currentNode.state)) {
+                System.out.println("Nodes expanded: "+visited.size());
+                System.out.println("Path cost: "+currentNode.depth);
+                System.out.println("path:");
+                System.out.println(toStringPath(start));
                 return currentNode;
             }
             for (Node nextNode : getLegalMoves(currentNode)) {
@@ -139,5 +143,17 @@ class PuzzleSolver {
         for(int i = 0; i < currentState.length; i++)
             newState[i] = currentState[i].clone();
         return newState;
+    }
+    private String toStringPath(Node node){
+        String path ="";
+        path = Arrays.deepToString(node.state);
+        while (node.parent) {
+            path = Arrays.deepToString(node.state)+"/n"+
+            "|" +"/n" +
+            "V"+"/n"
+            + path;
+            node = node.parent;
+        }
+        return path;
     }
 }
