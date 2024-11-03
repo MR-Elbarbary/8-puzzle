@@ -1,11 +1,8 @@
-package com.example;
-
-import main.java.com.example.Node;
-import main.java.com.example.puzzleSolver;
+package main.java.com.example;
 
 public class app {
     public static void main(String[] args) {
-        puzzleSolver solver = new PuzzleSolver();
+        puzzleSolver solver = new puzzleSolver();
 
         int[][] initialState = {
             {1, 2, 3},

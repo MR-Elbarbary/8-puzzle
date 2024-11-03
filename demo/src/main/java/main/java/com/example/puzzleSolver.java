@@ -2,7 +2,6 @@ package main.java.com.example;
 
 
 import java.util.*;
-import main.java.com.example.Node;
 
 public class puzzleSolver {
 
@@ -17,19 +16,30 @@ public class puzzleSolver {
         {0, -1}, // Left
         {0, 1}   // Right
     };
-    public Node DFS(Node start, Set<String> visited) {
-        if (Arrays.deepEquals(goalState, start.state)) {
-            System.out.println("Path cost: "+currentNode.depth);
-            System.out.println("path:");
-            System.out.println(toStringPath(start));
-            return start;
-        }
+    public Node DFS(Node start) {
+        Set<String> visited = new HashSet<>();
+        Stack<Node> stack = new Stack<>();
+        stack.add(start);
         visited.add(Arrays.deepToString(start.state));
-        for (Node nextNode : getLegalMoves(start)) {
-            if (!visited.contains(Arrays.deepToString(nextNode.state))) {
-                DFS(nextNode, visited);
+        while (!stack.isEmpty()) {
+            Node currentNode = stack.pop();
+            if (!visited.contains(Arrays.deepToString(currentNode.state))){
+                visited.add(Arrays.deepToString(currentNode.state));
+                if (Arrays.deepEquals(goalState, currentNode.state)) {
+                System.out.println("Nodes expanded: "+visited.size());
+                System.out.println("Path cost: "+currentNode.depth);
+                System.out.println("path:");
+                System.out.println(toStringPath(currentNode));
+                return currentNode;
+                }
+            }
+        for (Node nextNode : getLegalMoves(currentNode)) {
+                if (!visited.contains(Arrays.deepToString(nextNode.state))) {
+                    stack.add(nextNode);
+                }
             }
         }
+        System.out.println("error");
         return null;
     }
 
@@ -37,23 +47,25 @@ public class puzzleSolver {
         Set<String> visited = new HashSet<>();
         Queue<Node> queue = new LinkedList<>();
         queue.add(start);
-        visited.add(Arrays.deepToString(start.state));
         while (!queue.isEmpty()) {
             Node currentNode = queue.poll();
-            if (Arrays.deepEquals(goalState, currentNode.state)) {
+            if(!visited.contains(Arrays.deepToString(currentNode.state))){
+                visited.add(Arrays.deepToString(currentNode.state));
+                if (Arrays.deepEquals(goalState, currentNode.state)) {
                 System.out.println("Nodes expanded: "+visited.size());
                 System.out.println("Path cost: "+currentNode.depth);
                 System.out.println("path:");
-                System.out.println(toStringPath(start));
+                System.out.println(toStringPath(currentNode));
                 return currentNode;
             }
+            }   
             for (Node nextNode : getLegalMoves(currentNode)) {
                 if (!visited.contains(Arrays.deepToString(nextNode.state))) {
                     queue.add(nextNode);
-                    visited.add(Arrays.deepToString(nextNode.state));
                 }
             }
         }
+        System.out.println("error");
         return null;
     }
 
@@ -63,25 +75,27 @@ public class puzzleSolver {
         start.heuristic = heuristic(start);
         start.totalCost = start.depth + start.heuristic;
         minHeap.add(start);
-        visited.add(Arrays.deepToString(start.state));
         while (!minHeap.isEmpty()) {
             Node currentNode = minHeap.poll();
-            if (Arrays.deepEquals(goalState, currentNode.state)) {
+            if(!visited.contains(Arrays.deepToString(currentNode.state))){
+                visited.add(Arrays.deepToString(currentNode.state));
+                if (Arrays.deepEquals(goalState, currentNode.state)) {
                 System.out.println("Nodes expanded: "+visited.size());
                 System.out.println("Path cost: "+currentNode.depth);
                 System.out.println("path:");
-                System.out.println(toStringPath(start));
+                System.out.println(toStringPath(currentNode));
                 return currentNode;
+            }
             }
             for (Node nextNode : getLegalMoves(currentNode)) {
                 if (!visited.contains(Arrays.deepToString(nextNode.state))) {
                     nextNode.heuristic = heuristic(nextNode);
                     nextNode.totalCost = nextNode.depth + nextNode.heuristic;
-                    minHeap.add(nextNode);
-                    visited.add(Arrays.deepToString(nextNode.state));                    
+                    minHeap.add(nextNode);                    
                 }
             }
         }
+        System.out.println("error");
         return null;
     }
 
@@ -116,6 +130,7 @@ public class puzzleSolver {
         List<Node> moves = new ArrayList<>();
         int[][] currentState = node.state;
         int[] emptyTilePos = findEmptyTile(currentState);
+        
         int row = emptyTilePos[0];
         int col = emptyTilePos[1];
         for (int[] direction : directions) {
@@ -146,11 +161,19 @@ public class puzzleSolver {
     }
     private String toStringPath(Node node){
         String path ="";
-        path = Arrays.deepToString(node.state);
-        while (node.parent) {
-            path = Arrays.deepToString(node.state)+"/n"+
-            "|" +"/n" +
-            "V"+"/n"
+        String state = "";
+            for (int[] row : node.state) {
+                state = state + "\n"+Arrays.toString(row);
+            }
+        path = state;
+        while (node.parent != null) {
+            state = "";
+            for (int[] row : node.state) {
+                state = state+ "\n"+ Arrays.toString(row);
+            }
+            path = state+"\n"+
+            "    |" +"\n" +
+            "    V"+"\n"
             + path;
             node = node.parent;
         }
